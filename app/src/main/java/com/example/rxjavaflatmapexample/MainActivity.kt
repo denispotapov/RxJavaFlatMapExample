@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         initRecycler()
         getPostObservable()
             .subscribeOn(Schedulers.io())
-            .flatMap(object : Function<Post, ObservableSource<Post>> {
+            .concatMap(object : Function<Post, ObservableSource<Post>> {  // flatMap
                 override fun apply(t: Post): ObservableSource<Post> {
                     return getCommentsObservable(t)
                 }
