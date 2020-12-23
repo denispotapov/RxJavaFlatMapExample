@@ -1,20 +1,20 @@
 package com.example.rxjavaflatmapexample
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rxjavaflatmapexample.databinding.LayoutPostListItemBinding
 import com.example.rxjavaflatmapexample.models.Post
-import java.util.ArrayList
+import java.util.*
 
 
 class PostAdapter : ListAdapter<Post, PostAdapter.MyViewHolder>(PostDiffCallback()) {
 
     private lateinit var binding: LayoutPostListItemBinding
     private var posts: List<Post> = ArrayList()
+    private var listener: OnPostClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         binding = LayoutPostListItemBinding.inflate(
@@ -44,36 +44,35 @@ class PostAdapter : ListAdapter<Post, PostAdapter.MyViewHolder>(PostDiffCallback
         notifyItemChanged(posts.indexOf(post))
     }
 
+    fun getPosts(): List<Post> {
+        return posts
+    }
+
     private fun toArray(posts: List<Post>): MutableList<Post> {
         return posts.toMutableList()
     }
 
     inner class MyViewHolder(binding: LayoutPostListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         private val title = binding.title
-        private val numComments = binding.numComments
-        private val progressBar = binding.progressBar
+
+        init {
+            title.setOnClickListener {
+                listener?.onPostClick(adapterPosition)
+            }
+        }
 
         fun bind(post: Post) {
             title.text = post.title
-
-            if(post.comments == null) {
-                showProgressBar(true)
-                numComments.text = ""
-            }
-
-            else {
-                showProgressBar(false)
-                numComments.text = ((post.comments)?.size).toString()
-            }
         }
 
-        private fun showProgressBar(showProgressBar: Boolean) {
-            if (showProgressBar) {
-                progressBar.visibility = View.VISIBLE
-            } else {
-                progressBar.visibility = View.GONE
-            }
-        }
+    }
+
+    interface OnPostClickListener {
+        fun onPostClick(position: Int)
+    }
+
+    fun setOnItemClickListener(listener: OnPostClickListener) {
+        this.listener = listener
     }
 }
 
